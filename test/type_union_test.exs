@@ -1,7 +1,7 @@
 defmodule TypeUnionTest do
   use ExUnit.Case
 
-  use TypeUnion
+  require TypeUnion
 
   alias Test.Support.TypespecParser
   alias TypespecParser.Typespec
@@ -9,9 +9,9 @@ defmodule TypeUnionTest do
   test "creates types from atom lists" do
     {:module, _name, bytecode, _} =
       defmodule Test1 do
-        typeunion(:t, ~w[one two three]a)
-        typeunion(:t_2, ~w[thing another_thing]a, :typep)
-        typeunion(:t_3, ~w[1 2 3]a, :opaque)
+        TypeUnion.type :t, ~w[one two three]a
+        TypeUnion.typep :t_2, ~w[thing another_thing]a
+        TypeUnion.opaque :t_3, ~w[1 2 3]a
 
         # @typep types remain in bytecode only if public types depend on them
         @type public :: t_2()
@@ -33,7 +33,7 @@ defmodule TypeUnionTest do
       defmodule Test2 do
         @attribute ~w[one two three]a
 
-        typeunion(:t, @attribute)
+        TypeUnion.type :t, @attribute
       end
 
     expected_typespecs = MapSet.new([
