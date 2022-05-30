@@ -3,24 +3,31 @@ defmodule TypeUnion do
 
   for mode <- ~w[type typep opaque]a do
     defmacro unquote(mode)(name, elements) do
-      elements =
-        if is_list(elements) do
-          Macro.escape(elements)
-        else
-          elements
-        end
-
-      quote bind_quoted: [
-        name: name, elements: elements,
-        mode: unquote(mode), module: __MODULE__
-      ] do
-        ast = module._form_type_definition_ast(name, elements, mode)
-        Module.eval_quoted(__MODULE__, ast)
-      end
+      define_type(unquote(mode), name, elements)
     end
   end
 
-  def _form_type_definition_ast(name, elements, mode) do
+  defp define_type(mode, name, elements) do
+    elements =
+      if is_list(elements) do
+        Macro.escape(elements)
+      else
+        elements
+      end
+
+    quote bind_quoted: [
+            name: name,
+            elements: elements,
+            mode: mode,
+            module: __MODULE__
+          ] do
+      name
+      |> module._form_type_definition(elements, mode)
+      |> then(&Module.eval_quoted(__MODULE__, &1))
+    end
+  end
+
+  def _form_type_definition(name, elements, mode) do
     type_union =
       elements
       |> Enum.reverse()
@@ -33,9 +40,9 @@ defmodule TypeUnion do
     type_ast = quote do: unquote(name_var) :: unquote(type_union)
 
     case mode do
-      :type -> quote do: @type unquote(type_ast)
-      :typep -> quote do: @typep unquote(type_ast)
-      :opaque -> quote do: @opaque unquote(type_ast)
+      :type -> quote do: @type(unquote(type_ast))
+      :typep -> quote do: @typep(unquote(type_ast))
+      :opaque -> quote do: @opaque(unquote(type_ast))
     end
   end
 end
