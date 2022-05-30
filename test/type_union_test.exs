@@ -44,4 +44,19 @@ defmodule TypeUnionTest do
 
     assert MapSet.subset?(expected_typespecs, typespecs)
   end
+
+  test "creates type from list with non-literals" do
+    {:module, _name, bytecode, _} =
+      defmodule Test3 do
+        TypeUnion.type :t, [atom(), integer(), nil]
+      end
+
+    expected_typespecs = MapSet.new([
+      %Typespec{name: :t, mode: :type, elements: ~w[atom integer nil]a}
+    ])
+
+    typespecs = TypespecParser.fetch_types(bytecode)
+
+    assert MapSet.subset?(expected_typespecs, typespecs)
+  end
 end

@@ -44,6 +44,9 @@ defmodule Test.Support.TypespecParser do
   end
 
   defp parse_union(union) do
-    Enum.map(union, fn {:atom, _, atom} -> atom end)
+    Enum.map(union, fn
+      {:atom, _, atom} -> atom
+      {:type, _, type, _} -> type
+    end)
   end
 end

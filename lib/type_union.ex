@@ -3,6 +3,13 @@ defmodule TypeUnion do
 
   for mode <- ~w[type typep opaque]a do
     defmacro unquote(mode)(name, elements) do
+      elements =
+        if is_list(elements) do
+          Macro.escape(elements)
+        else
+          elements
+        end
+
       quote bind_quoted: [
         name: name, elements: elements,
         mode: unquote(mode), module: __MODULE__
