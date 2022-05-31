@@ -28,21 +28,12 @@ defmodule TypeUnion do
   end
 
   def _form_type_definition(name, elements, mode) do
-    type_union =
-      elements
-      |> Enum.reverse()
-      |> Enum.reduce(fn element, acc ->
-        quote do: unquote(element) | unquote(acc)
-      end)
-
-    name_var = Macro.var(name, nil)
-
-    type_ast = quote do: unquote(name_var) :: unquote(type_union)
-
-    case mode do
-      :type -> quote do: @type(unquote(type_ast))
-      :typep -> quote do: @typep(unquote(type_ast))
-      :opaque -> quote do: @opaque(unquote(type_ast))
-    end
+    elements
+    |> Enum.reverse()
+    |> Enum.reduce(fn element, acc ->
+      quote do: unquote(element) | unquote(acc)
+    end)
+    |> then(&quote do: unquote(Macro.var(name, nil)) :: unquote(&1))
+    |> then(&quote do: @(unquote(mode)(unquote(&1))))
   end
 end
