@@ -23,14 +23,14 @@ defmodule TypeUnion.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:credo, "~> 1.5", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.1", only: [:dev], runtime: false},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
   end
 
   defp dialyzer do
     [
-      flags: ~w(error_handling underspecs unknown unmatched_returns)a
+      flags: ~w[error_handling underspecs unknown unmatched_returns]a
     ]
   end
 end
